@@ -6,4 +6,6 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 project(week-2)
 
 # add the executable
-add_executable(buses buses1.cpp)
+add_executable(buses1 buses1.cpp)
+add_executable(buses2 buses2.cpp)
+
