@@ -55,55 +55,38 @@ ostream& operator<<(ostream& os, const Date& date)
     return os;
 }
 
+
+Date ParseDate(const string& s)
+{
+    stringstream ss(s);
+
+    int year, month, day;
+    char c1, c2;
+
+    ss >> year >> c1 >> month >> c2 >> day;
+
+    if (ss.fail() || ss.peek() != EOF || c1 != '-' || c2 != '-')
+    {
+        cout << "Wrong date format: " << s << endl;
+        throw runtime_error("");
+    }
+
+    return Date(year, month, day);
+}
+
 istream& operator>>(istream& is, Date& date)
 {
-    string line;
+    string s;
 
     if (is)
     {
-        is >> line;
-        cout << "is line: " << line << endl;
-
-        if (is && line.size() > 0)
-        {
-            istringstream ss(line);
-
-            int y, m, d;
-            char c1, c2;
-
-            ss >> y >> c1 >> m >> c2 >> d;
-
-            cout << " year: " << y;
-            cout << " separator: " << c1;
-            cout << " month: " << m;
-            cout << " separator: " << c2;
-            cout << " day: " << d;
-            cout << endl;
-
-            if (c1 == '-' && c2 == '-')
-            {
-                date = Date(y, m, d);
-            }
-            else
-            {
-                cout << "Wrong date format: " << line << endl;
-                throw runtime_error("");
-            }
-        }
-        else
-        {
-            cout << "Wrong date format: " << line << endl;
-            throw runtime_error("");
-        }
-    }
-    else
-    {
-        cout << "Wrong date format: " << line << endl;
-        throw runtime_error("");
+        is >> s;
+        date = ParseDate(s);
     }
 
     return is;
 }
+
 
 bool operator<(const Date& lhs, const Date& rhs)
 {
@@ -129,6 +112,12 @@ bool operator<(const Date& lhs, const Date& rhs)
     {
         return lhs.GetYear() < rhs.GetYear();
     }
+
+
+    // воспользуемся тем фактом, что векторы уже можно сравнивать на <:
+    // создадим вектор из года, месяца и дня для каждой даты и сравним их
+    // return vector<int>{lhs.GetYear(), lhs.GetMonth(), lhs.GetDay()} <
+    //     vector<int>{rhs.GetYear(), rhs.GetMonth(), rhs.GetDay()};
 }
 
 
@@ -185,6 +174,9 @@ class Database
         {
             Date date = d.first;
 
+            if (date.GetYear() < 0)
+                continue;
+
             for (const auto& event : d.second)
             {
                 cout << date << " " << event << endl;
@@ -196,38 +188,11 @@ class Database
     map<Date, set<string>> db;
 };
 
-// - добавление события:                        Add Дата Событие
-// - удаление события:                          Del Дата Событие
-// - удаление всех событий за конкретную дату:  Del Дата
-// - поиск событий за конкретную дату:          Find Дата
-// - печать всех событий за все даты:           Print
 
 int main()
 {
     Database db;
     string command;
-    //
-    // istringstream input("Add 0-1-2 event1\n"
-    //                     "Add 1-2-3 event2\n"
-    //                     "Add 1-2-3 event2\n"
-    //                     "Del 1-+-1-1 event\n"
-    //                     // "Add 0-13-32 event1"
-    //                     "Add 1-1-1 event3\n"
-    //                     "Add -1-1-1 event4\n"
-    //                     // "Add 1--1-1 event5\n"
-    //                     // "Add 1---1-1 event6\n"
-    //                     "Add 1-+1-+1 event7\n"
-    //                     "Print\n"
-    //                     "Del 0-1-2 event2\n"
-    //                     "Del 0-1-2 event1\n"
-    //                     "Del 1-1-1\n"
-    //                     "Find 0-1-2\n"
-    //                     "Find 1-2-3\n"
-    //                     "Print\n");
-    //
-    // istringstream input("Add 1-1-1 event1\n"
-    //                     "Del 1-1-1 event1\n"
-    //                     "Print\n");
 
     // istringstream input("BadCommand\n"
     //                     "Add 1-+-1-666 event1\n"
@@ -240,22 +205,10 @@ int main()
     //                     "Add 2-2-1 event1\n"
     //                     "Add 3-1-1 event2\n"
     //                     "Print\n");
-    // istringstream input("Add 1-1-1 event1\n"
-    //                     "Del 1-1-1 event\n"
-    //                     "Print\n");
-    istringstream input(
-        // "Add\n"
-        // "Add -1-1-1 event\n"
-        "Add 1-1-1- event\n"
-        "Add 1-1-1a event\n"
-        "Add 1-1--1 event\n"
-        "Add 1--1-1 event\n"
-        "Add a-1-1 event\n"
-        "Add 1-a-1 event\n"
-        "Add 1-1-a event\n");
-
-    while (getline(input, command))
-    // while (getline(cin, command))
+    // istringstream input("Add 1-0- event1\n");
+    // while (getline(input, command))
+    //
+    while (getline(cin, command))
     {
         istringstream ss(command);
 
@@ -270,8 +223,8 @@ int main()
                 Date date;
                 string event;
                 ss >> date >> event;
-                cout << "Command: " << command << endl;
-                cout << "Date: " << date << " event: " << event << endl;
+                // cout << "Command: " << command << endl;
+                // cout << "Date: " << date << " event: " << event << endl;
                 db.AddEvent(date, event);
             }
             else if (command_code == "Del")
@@ -301,6 +254,10 @@ int main()
             else if (command_code == "Print")
             {
                 db.Print();
+            }
+            else if (ss)
+            {
+                cout << "Unknown command: " << command_code << endl;
             }
         }
         catch (exception&)
