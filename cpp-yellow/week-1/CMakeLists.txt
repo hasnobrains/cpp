@@ -7,4 +7,6 @@ project(week-1)
 
 # add the executable
 add_executable(matrix matrix.cpp)
+add_executable(temperature temperature.cpp)
+add_executable(block_weight block_weight.cpp)
 
