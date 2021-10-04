@@ -4,15 +4,37 @@
 
 using namespace std;
 
-template <typename Collection> Collection Sqr(const Collection& c);
+template <typename T> T Sqr(T x);
+template <typename T> vector<T> Sqr(vector<T> v);
+template <typename K, typename V> map<K, V> Sqr(map<K, V> m);
+template <typename K, typename V> pair<K, V> Sqr(pair<K, V> p);
 
-template <typename Collection> Collection Sqr(const Collection& c)
+
+template <typename T> T Sqr(T x) { return x * x; }
+
+template <typename T> vector<T> Sqr(vector<T> v)
 {
-    Collection new;
-    for (const auto& item : c)
+    for (auto& item : v)
     {
-        newitem* item;
+        item = Sqr(item);
     }
+    return v;
+}
+
+template <typename K, typename V> map<K, V> Sqr(map<K, V> m)
+{
+    for (auto& [key, value] : m)
+    {
+        m[key] = Sqr(value);
+    }
+    return m;
+}
+
+template <typename K, typename V> pair<K, V> Sqr(pair<K, V> p)
+{
+    p.first = Sqr(p.first);
+    p.second = Sqr(p.second);
+    return p;
 }
 
 
