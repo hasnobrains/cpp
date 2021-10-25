@@ -10,3 +10,4 @@ project(week-2)
 
 # add the executable
 add_executable(bus1 bus1.cpp)
+add_executable(test_equation test_equation.cpp)
