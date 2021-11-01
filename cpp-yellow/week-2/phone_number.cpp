@@ -1,39 +1,24 @@
 #include <iostream>
+#include <sstream>
 #include <stdexcept>
 
 #include "phone_number.h"
 
 PhoneNumber::PhoneNumber(const string& international_number)
 {
-    if (international_number.at(0) != '+')
+    istringstream is(international_number);
+
+    char sign = is.get();
+    getline(is, country_code_, '-');
+    getline(is, city_code_, '-');
+    getline(is, local_number_);
+
+    if (sign != '+' || country_code_.empty() || city_code_.empty() ||
+        local_number_.empty())
     {
-        throw invalid_argument("Wrong format " + international_number);
-    }
-
-    size_t first_dash = international_number.find("-");
-
-    if (first_dash == string::npos)
-    {
-        throw invalid_argument("Wrong format " + international_number);
-    }
-
-    country_code_ = international_number.substr(1, first_dash - 1);
-
-    size_t second_dash = international_number.find("-", first_dash + 1);
-
-    if (second_dash == string::npos)
-    {
-        throw invalid_argument("Wrong format " + international_number);
-    }
-
-
-    city_code_ = international_number.substr(first_dash + 1,
-                                             second_dash - first_dash - 1);
-    local_number_ = international_number.substr(second_dash + 1);
-
-    if (country_code_.empty() || city_code_.empty() || local_number_.empty())
-    {
-        throw invalid_argument("Wrong format " + international_number);
+        throw invalid_argument("Phone number must begin with '+' symbol and "
+                               "contain 3 parts separated by '-' symbol: " +
+                               international_number);
     }
 }
 

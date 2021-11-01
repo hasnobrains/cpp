@@ -4,6 +4,10 @@
 void Test()
 {
     {
+        PhoneNumber phone_number({});
+        AssertEqual(phone_number.GetInternationalNumber(), "", "{}");
+    }
+    {
         PhoneNumber phone_number("+7-495-111-22-33");
         AssertEqual(phone_number.GetInternationalNumber(), "+7-495-111-22-33",
                     "+7-495-111-22-33");

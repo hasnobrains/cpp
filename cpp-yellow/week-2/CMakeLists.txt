@@ -18,3 +18,4 @@ add_executable(test_palindrome test_palindrome.cpp)
 add_executable(test_sum_reverse_sort sum_reverse_sort.cpp
     sum_reverse_sort_test.cpp)
 add_executable(test_phone_number phone_number.cpp phone_number_test.cpp)
+add_executable(bus main.cpp bus_manager.cpp query.cpp responses.cpp)
