@@ -150,39 +150,18 @@ class Budget
 
     double ComputeIncome(const Date& from, const Date& to)
     {
-        auto from_it = begin(v);
+        auto fold = [from, to](double accumulator, pair<time_t, double> b) {
+            if (b.first >= from.GetTimestamp() && b.first <= to.GetTimestamp())
+            {
+                return accumulator + b.second;
+            }
+            else
+            {
+                return accumulator;
+            }
+        };
 
-        if (!v.empty() && from.GetTimestamp() > from_it->first)
-        {
-            from_it = find_if(begin(v), end(v),
-                              [from](pair<time_t, double> p)
-                              { return p.first == from.GetTimestamp(); });
-        }
-
-        cout << "from " << from_it->first << endl;
-
-        auto to_it = end(v);
-
-        if (!v.empty() && to.GetTimestamp() > (to_it - 1)->first)
-        {
-            to_it = find_if(begin(v), end(v),
-                            [to](pair<time_t, double> p)
-                            { return p.first == to.GetTimestamp(); });
-        }
-
-        cout << "to " << to_it->first << endl;
-
-        auto fold = [](double a, pair<time_t, double> b)
-        { return move(a) + b.second; };
-
-        for (auto& p : v)
-        {
-            cout << p.first << " " << p.second << endl;
-        }
-
-        double income = accumulate(from_it, to_it, 0.0, fold);
-        cout << "income " << income << endl;
-        return income;
+        return accumulate(begin(v), end(v), 0.0, fold);
     }
 
   private:
@@ -193,10 +172,47 @@ void Test()
 {
     {
         Budget budget;
+        double expected = 0.0;
+        double income =
+            budget.ComputeIncome(Date(2000, 2, 1), Date(2099, 2, 1));
+        AssertEqual(income, expected, "empty");
+    }
+    {
+        Budget budget;
+        double expected = 0.0;
+        double income =
+            budget.ComputeIncome(Date(2099, 2, 1), Date(2000, 2, 1));
+        AssertEqual(income, expected, "empty backwards");
+    }
+    {
+        Budget budget;
+        budget.Earn(Date(2000, 2, 1), Date(2000, 3, 1), 20);
+        double expected = 0.6666666666666666296592325;
+        double income =
+            budget.ComputeIncome(Date(2000, 2, 1), Date(2000, 2, 1));
+        AssertEqual(income, expected, "one day income");
+    }
+    {
+        Budget budget;
+        budget.Earn(Date(2000, 2, 1), Date(2000, 3, 1), 20);
+        double expected = 1.333333333333333259318465;
+        double income =
+            budget.ComputeIncome(Date(2000, 2, 1), Date(2000, 2, 2));
+        AssertEqual(income, expected, "two days income");
+    }
+    {
+        Budget budget;
         budget.Earn(Date(2000, 2, 1), Date(2000, 3, 1), 20);
         double income =
             budget.ComputeIncome(Date(2000, 2, 1), Date(2000, 3, 1));
-        AssertEqual(income, 20, "20");
+        AssertEqual(income, 20, "20 days income");
+    }
+    {
+        Budget budget;
+        budget.Earn(Date(2000, 2, 1), Date(2000, 3, 1), 20);
+        double income =
+            budget.ComputeIncome(Date(2000, 3, 1), Date(2000, 2, 1));
+        AssertEqual(income, 0.0, "20 days income backwards");
     }
     {
         Budget budget;
@@ -222,17 +238,37 @@ void Test()
     {
         Budget budget;
         budget.Earn(Date(2000, 2, 1), Date(2000, 3, 1), 20);
+        budget.Earn(Date(2000, 2, 3), Date(2000, 2, 3), 10);
+        double expected = 10.6666666666666666296592325;
         double income =
-            budget.ComputeIncome(Date(2000, 2, 1), Date(2000, 2, 1));
-        AssertEqual(income, 20, "one day");
+            budget.ComputeIncome(Date(2000, 2, 3), Date(2000, 2, 3));
+        AssertEqual(income, expected, "one day two incomes");
+    }
+    {
+        Budget budget;
+        budget.Earn(Date(2000, 2, 1), Date(2000, 3, 1), 20);
+        budget.Earn(Date(2000, 2, 3), Date(2000, 2, 3), 10);
+        double expected = 30.00000000000002131628207;
+        double income =
+            budget.ComputeIncome(Date(2000, 1, 1), Date(2099, 12, 31));
+        AssertEqual(income, expected, "from 2000-1-1 to 2099-12-31");
+    }
+    {
+        Budget budget;
+        budget.Earn(Date(2000, 2, 1), Date(2000, 3, 1), 20);
+        budget.Earn(Date(2000, 2, 3), Date(2000, 2, 3), 10);
+        double expected = 0.0;
+        double income =
+            budget.ComputeIncome(Date(2099, 1, 1), Date(2000, 12, 31));
+        AssertEqual(income, expected, "from 2000-1-1 to 2099-12-31 backeards");
     }
 }
 
 int main()
 {
-    TestRunner tr;
-    tr.RunTest(Test, "Test");
-    return 0;
+    // TestRunner tr;
+    // tr.RunTest(Test, "Test");
+    // return 0;
 
     Budget budget;
 
