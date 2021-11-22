@@ -24,3 +24,6 @@ add_executable(budget_starter_plus budget_starter_plus.cpp)
 add_executable(person_names person_names.cpp)
 add_executable(find_starts_with_char find_starts_with_char.cpp)
 add_executable(find_starts_with_string find_starts_with_string.cpp)
+add_executable(build_expression build_expression.cpp)
+add_executable(build_expression_without_redundant_brackets
+    build_expression_without_redundant_brackets.cpp)
