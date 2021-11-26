@@ -29,7 +29,7 @@ Date ParseDate(istream& is)
         throw runtime_error("");
     }
 
-    return Date(year, month, day);
+    return Date(year, month, day, date);
 }
 
 istream& operator>>(istream& is, Date& date)
@@ -47,5 +47,34 @@ istream& operator>>(istream& is, Date& date)
 bool operator<(const Date& lhs, const Date& rhs)
 {
     return vector<int>{lhs.GetYear(), lhs.GetMonth(), lhs.GetDay()} <
+           vector<int>{rhs.GetYear(), rhs.GetMonth(), rhs.GetDay()};
+}
+bool operator<=(const Date& lhs, const Date& rhs)
+{
+    return vector<int>{lhs.GetYear(), lhs.GetMonth(), lhs.GetDay()} <=
+           vector<int>{rhs.GetYear(), rhs.GetMonth(), rhs.GetDay()};
+}
+
+bool operator>(const Date& lhs, const Date& rhs)
+{
+    return vector<int>{lhs.GetYear(), lhs.GetMonth(), lhs.GetDay()} >
+           vector<int>{rhs.GetYear(), rhs.GetMonth(), rhs.GetDay()};
+}
+
+bool operator>=(const Date& lhs, const Date& rhs)
+{
+    return vector<int>{lhs.GetYear(), lhs.GetMonth(), lhs.GetDay()} >=
+           vector<int>{rhs.GetYear(), rhs.GetMonth(), rhs.GetDay()};
+}
+
+bool operator==(const Date& lhs, const Date& rhs)
+{
+    return vector<int>{lhs.GetYear(), lhs.GetMonth(), lhs.GetDay()} ==
+           vector<int>{rhs.GetYear(), rhs.GetMonth(), rhs.GetDay()};
+}
+
+bool operator!=(const Date& lhs, const Date& rhs)
+{
+    return vector<int>{lhs.GetYear(), lhs.GetMonth(), lhs.GetDay()} !=
            vector<int>{rhs.GetYear(), rhs.GetMonth(), rhs.GetDay()};
 }

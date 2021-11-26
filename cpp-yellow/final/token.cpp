@@ -136,3 +136,33 @@ vector<Token> Tokenize(istream& cl)
 
     return tokens;
 }
+
+ostream& operator<<(ostream& os, const Token& token)
+{
+    switch (token.type)
+    {
+        case TokenType::DATE:
+            os << "DATE";
+            break;
+        case TokenType::EVENT:
+            os << "EVENT";
+            break;
+        case TokenType::COLUMN:
+            os << "COLUMN";
+            break;
+        case TokenType::LOGICAL_OP:
+            os << "LOGICAL_OP";
+            break;
+        case TokenType::COMPARE_OP:
+            os << "COMPARE_OP";
+            break;
+        case TokenType::PAREN_LEFT:
+            os << "PAREN_LEFT";
+            break;
+        case TokenType::PAREN_RIGHT:
+            os << "PAREN_RIGHT";
+            break;
+    }
+    os << ":" << token.value;
+    return os;
+}

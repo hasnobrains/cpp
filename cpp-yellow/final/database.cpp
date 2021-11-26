@@ -1,48 +1,15 @@
 #include "database.h"
+#include <algorithm>
 
 using namespace std;
 
 void Database::Add(const Date& date, const string& event)
 {
-    if (db[date].count(event) == 0)
+    if (db.find(date) == db.end() ||
+        find(db[date].begin(), db[date].end(), event) == db[date].end())
     {
-        db[date].insert(event);
-    }
-}
-
-bool Database::DeleteEvent(const Date& date, const string& event)
-{
-    bool erased = false;
-
-    if (db.count(date) > 0)
-    {
-        erased = db[date].erase(event);
-    }
-
-    return erased;
-}
-
-int Database::DeleteDate(const Date& date)
-{
-    int size = 0;
-
-    if (db.count(date) > 0)
-    {
-        size = db[date].size();
-        db.erase(date);
-    }
-
-    return size;
-}
-
-void Database::Find(const Date& date) const
-{
-    if (db.count(date) > 0)
-    {
-        for (const auto& event : db.at(date))
-        {
-            cout << event << endl;
-        }
+        cout << "Adding [" << date << ", " << event << "]" << endl;
+        db[date].push_back(event);
     }
 }
 
@@ -59,5 +26,66 @@ void Database::Print(ostream& os) const
         {
             os << date << " " << event << endl;
         }
+    }
+}
+
+template <class UnaryPredicate> int Database::RemoveIf(UnaryPredicate p)
+{
+    int counter = 0;
+
+    for (const auto& d : db)
+    {
+        Date date = d.first;
+
+        if (date.GetYear() < 0)
+            continue;
+
+        vector<string> events = d.second;
+
+        auto comp = [p, date](const string& event) { return p(date, event); };
+        auto it = remove_if(events.begin(), events.end(), comp);
+
+        counter += distance(it, events.end());
+        events.erase(it, events.end());
+    }
+
+    return counter;
+}
+
+template <class UnaryPredicate>
+vector<string> Database::FindIf(UnaryPredicate p)
+{
+    vector<string> result;
+
+    for (const auto& d : db)
+    {
+        Date date = d.first;
+
+        if (date.GetYear() < 0)
+            continue;
+
+        for (const auto& event : d.second)
+        {
+            if (p(date, event))
+            {
+                result.push_back(date.GetDate() + " " + event);
+            }
+        }
+    }
+
+    return result;
+}
+
+string Database::Last(const Date& date) const
+{
+    auto it = upper_bound(db.begin(), db.end(), date);
+
+    if (it != db.begin())
+    {
+        return (--it)->second.back();
+    }
+    else
+    {
+        return "No entries";
     }
 }

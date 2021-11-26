@@ -32,6 +32,7 @@ int main()
         is >> command;
         if (command == "Add")
         {
+            // Add 2017-11-07 big sport event
             const auto date = ParseDate(is);
             const auto event = ParseEvent(is);
             db.Add(date, event);
@@ -42,6 +43,9 @@ int main()
         }
         else if (command == "Del")
         {
+            // Del event != "holiday"
+            // Del date < 2017-01-01 AND (event == "holiday" OR event == "sport
+            // event")
             auto condition = ParseCondition(is);
             auto predicate = [condition](const Date& date,
                                          const string& event) {
@@ -52,6 +56,9 @@ int main()
         }
         else if (command == "Find")
         {
+            // Find date < 2017-11-06
+            // Find date >= 2017-01-01 AND date < 2017-07-01 AND event == "sport
+            // event"
             auto condition = ParseCondition(is);
             auto predicate = [condition](const Date& date,
                                          const string& event) {
@@ -67,6 +74,7 @@ int main()
         }
         else if (command == "Last")
         {
+            // Last 2017-06-01
             try
             {
                 cout << db.Last(ParseDate(is)) << endl;

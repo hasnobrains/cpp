@@ -2,6 +2,7 @@
 
 #include <sstream>
 #include <vector>
+
 using namespace std;
 
 enum class TokenType
@@ -21,4 +22,5 @@ struct Token
     const TokenType type;
 };
 
+ostream& operator<<(ostream& os, const Token& token);
 vector<Token> Tokenize(istream& cl);

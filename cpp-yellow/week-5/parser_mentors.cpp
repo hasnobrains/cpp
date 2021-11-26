@@ -15,23 +15,36 @@ using namespace std;
 struct Node
 {
     virtual int Evaluate() const = 0;
+    virtual void Print() const = 0;
 };
 
 struct Value : public Node
 {
     Value(char digit) : _value(digit - '0') {}
 
-    int Evaluate() const override { return _value; }
+    int Evaluate() const override
+    {
+        Print();
+        return _value;
+    }
+
+    void Print() const override { cout << "value: " << _value; }
 
   private:
-    const uint8_t _value;
+    const uint16_t _value;
 };
 
 struct Variable : public Node
 {
     Variable(const int& x) : _x(x) {}
 
-    int Evaluate() const override { return _x; }
+    int Evaluate() const override
+    {
+        Print();
+        return _x;
+    }
+
+    void Print() const override { cout << "variable: " << _x; }
 
   private:
     const int& _x;
@@ -58,6 +71,9 @@ struct Op : public Node
 
     int Evaluate() const override
     {
+        cout << "evaluate ";
+        Print();
+
         if (_op == '*')
         {
             return _left->Evaluate() * _right->Evaluate();
@@ -74,6 +90,15 @@ struct Op : public Node
         return 0;
     }
 
+    void Print() const override
+    {
+        cout << "op: " << _op << " [left ";
+        _left->Print();
+        cout << ", right ";
+        _right->Print();
+        cout << "] ";
+    }
+
     void SetLeft(shared_ptr<Node> node) { _left = node; }
     void SetRight(shared_ptr<Node> node) { _right = node; }
 
@@ -81,6 +106,20 @@ struct Op : public Node
     const char _op;
     shared_ptr<const Node> _left, _right;
 };
+
+void PrintStack(stack<shared_ptr<Node>> values)
+{
+    if (values.empty())
+    {
+        return;
+    }
+
+    shared_ptr<Node> value = values.top();
+    values.pop();
+    PrintStack(values);
+    value->Print();
+    values.push(value);
+}
 
 template <class Iterator>
 shared_ptr<Node> Parse(Iterator token, Iterator end, const int& x)
@@ -97,6 +136,7 @@ shared_ptr<Node> Parse(Iterator token, Iterator end, const int& x)
     auto PopOps = [&](int precedence) {
         while (!ops.empty() && ops.top()->precedence >= precedence)
         {
+            cout << "popops" << endl;
             auto value1 = values.top();
             values.pop();
             auto value2 = values.top();
@@ -114,9 +154,13 @@ shared_ptr<Node> Parse(Iterator token, Iterator end, const int& x)
     while (token != end)
     {
         const auto& value = *token;
+        cout << "value [" << value << "]" << endl;
+
         if (value >= '0' && value <= '9')
         {
             values.push(make_shared<Value>(value));
+            auto value = values.top();
+            value->Print();
         }
         else if (value == 'x')
         {
@@ -140,6 +184,8 @@ shared_ptr<Node> Parse(Iterator token, Iterator end, const int& x)
     {
         PopOps(0);
     }
+
+    PrintStack(values);
 
     return values.top();
 }
