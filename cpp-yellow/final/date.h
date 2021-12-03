@@ -1,6 +1,8 @@
 #pragma once
 
+#include <iomanip>
 #include <iostream>
+#include <sstream>
 
 using namespace std;
 
@@ -14,7 +16,7 @@ class Date
         day = 0;
     };
 
-    Date(int y, int m, int d, string date)
+    Date(int y, int m, int d)
     {
         if (m < 1 || m > 12)
         {
@@ -36,13 +38,19 @@ class Date
     int GetYear() const { return year; }
     int GetMonth() const { return month; }
     int GetDay() const { return day; }
-    string GetDate() const { return date; }
+    string GetDate() const
+    {
+        stringstream ss;
+        ss << setw(4) << setfill('0') << year << "-" << setw(2) << month << "-"
+           << setw(2) << day;
+        return ss.str();
+    }
+
 
   private:
     int year;
     int month;
     int day;
-    string date;
 };
 
 Date ParseDate(istream& is);

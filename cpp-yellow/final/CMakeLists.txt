@@ -11,4 +11,5 @@ add_compile_definitions(DEBUG)
 project(final)
 
 # add the executable
-add_executable(inheritance inheritance.cpp)
+add_executable(db condition_parser.cpp condition_parser_test.cpp database.cpp date.cpp main.cpp node.cpp
+    token.cpp)

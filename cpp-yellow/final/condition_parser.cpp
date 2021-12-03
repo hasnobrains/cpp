@@ -137,12 +137,12 @@ shared_ptr<Node> ParseCondition(istream& is)
 {
     auto tokens = Tokenize(is);
 
-    cout << "tokens [";
-    for (auto& token : tokens)
-    {
-        cout << token << " ";
-    }
-    cout << "]" << endl;
+    // cout << "tokens [";
+    // for (auto& token : tokens)
+    // {
+    //     cout << token << " ";
+    // }
+    // cout << "]" << endl;
 
     auto current = tokens.begin();
     auto top_node = ParseExpression(current, tokens.end(), 0u);

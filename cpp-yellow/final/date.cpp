@@ -1,7 +1,5 @@
-#include <iomanip>
-#include <vector>
-
 #include "date.h"
+#include <vector>
 
 using namespace std;
 
@@ -29,7 +27,7 @@ Date ParseDate(istream& is)
         throw runtime_error("");
     }
 
-    return Date(year, month, day, date);
+    return Date(year, month, day);
 }
 
 istream& operator>>(istream& is, Date& date)
