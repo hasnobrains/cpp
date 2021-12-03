@@ -31,55 +31,48 @@ void Database::Print(ostream& os) const
 
 string Database::Last(const Date& date) const
 {
-    cout << "db:" << endl;
-    Print(cout);
+    auto it = db.lower_bound(date);
 
-    auto it = upper_bound(
-        db.begin(), db.end(), date,
-        [](const Date& date, pair<const Date&, const vector<string>> p) {
-            cout << "date " << date << " first " << p.first << endl;
-            return date < p.first;
-        });
-
-    if (it != db.begin())
-    {
-        ostringstream os;
-        --it;
-        cout << it->first << " " << it->second.back() << endl;
-        os << it->first << " " << it->second.back();
-        return os.str();
-    }
-    else
+    if (it == db.begin() && it->first != date)
     {
         return "No entries";
     }
+
+    if (it == db.end())
+    {
+        --it;
+    }
+
+    ostringstream os;
+    os << it->first << " " << it->second.back();
+
+    return os.str();
 }
 
 int Database::RemoveIf(std::function<bool(Date, string)> p)
 {
-    // cout << "before" << endl;
-    // Print(cout);
-
     int counter = 0;
 
-    for (auto& d : db)
+    for (auto it = db.begin(); it != db.end();)
     {
-        Date date = d.first;
-
-        if (date.GetYear() < 0)
-            continue;
-
-        vector<string>& events = d.second;
+        Date date = it->first;
+        vector<string>& events = it->second;
 
         auto comp = [p, date](const string& event) { return p(date, event); };
-        auto it = remove_if(events.begin(), events.end(), comp);
+        auto from = remove_if(events.begin(), events.end(), comp);
 
-        counter += distance(it, events.end());
-        events.erase(it, events.end());
+        counter += distance(from, events.end());
+        events.erase(from, events.end());
+
+        if (events.empty())
+        {
+            it = db.erase(it);
+        }
+        else
+        {
+            ++it;
+        }
     }
-
-    // cout << "after" << endl;
-    // Print(cout);
 
     return counter;
 }
