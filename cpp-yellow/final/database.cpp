@@ -5,11 +5,11 @@ using namespace std;
 
 void Database::Add(const Date& date, const string& event)
 {
-    if (db.find(date) == db.end() ||
-        find(db[date].begin(), db[date].end(), event) == db[date].end())
+    if (dbs[date].count(event) == 0)
     {
         // cout << "Adding [" << date << ", " << event << "]" << endl;
         db[date].push_back(event);
+        dbs[date].insert(event);
     }
 }
 
@@ -31,17 +31,14 @@ void Database::Print(ostream& os) const
 
 string Database::Last(const Date& date) const
 {
-    auto it = db.lower_bound(date);
+    auto it = db.upper_bound(date);
 
-    if (it == db.begin() && it->first != date)
+    if (it == db.begin())
     {
         return "No entries";
     }
 
-    if (it == db.end())
-    {
-        --it;
-    }
+    --it;
 
     ostringstream os;
     os << it->first << " " << it->second.back();
@@ -58,15 +55,20 @@ int Database::RemoveIf(std::function<bool(Date, string)> p)
         Date date = it->first;
         vector<string>& events = it->second;
 
-        auto comp = [p, date](const string& event) { return p(date, event); };
-        auto from = remove_if(events.begin(), events.end(), comp);
+        auto comp = [p, date](const string& event) { return !p(date, event); };
+        auto from = stable_partition(events.begin(), events.end(), comp);
 
         counter += distance(from, events.end());
-        events.erase(from, events.end());
+        for (auto i = from; i != events.end();)
+        {
+            dbs[date].erase(*i);
+            i = events.erase(i);
+        }
 
         if (events.empty())
         {
             it = db.erase(it);
+            dbs.erase(date);
         }
         else
         {

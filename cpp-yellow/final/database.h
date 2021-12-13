@@ -5,6 +5,7 @@
 #include <algorithm>
 #include <iostream>
 #include <map>
+#include <set>
 #include <string>
 #include <vector>
 
@@ -20,57 +21,9 @@ class Database
     int RemoveIf(std::function<bool(Date, string)> p);
     vector<string> FindIf(std::function<bool(Date, string)> p) const;
 
-    // template <class UnaryPredicate> int RemoveIf(UnaryPredicate p);
-    // template <class UnaryPredicate> vector<string> FindIf(UnaryPredicate p);
     string Last(const Date& date) const;
 
   private:
     map<Date, vector<string>> db;
+    map<Date, set<string>> dbs;
 };
-//
-// template <class UnaryPredicate> int Database::RemoveIf(UnaryPredicate p)
-// {
-//     int counter = 0;
-//
-//     for (const auto& d : db)
-//     {
-//         Date date = d.first;
-//
-//         if (date.GetYear() < 0)
-//             continue;
-//
-//         vector<string> events = d.second;
-//
-//         auto comp = [p, date](const string& event) { return p(date, event);
-//         }; auto it = remove_if(events.begin(), events.end(), comp);
-//
-//         counter += distance(it, events.end());
-//         events.erase(it, events.end());
-//     }
-//
-//     return counter;
-// }
-//
-// template <class UnaryPredicate>
-// vector<string> Database::FindIf(UnaryPredicate p)
-// {
-//     vector<string> result;
-//
-//     for (const auto& d : db)
-//     {
-//         Date date = d.first;
-//
-//         if (date.GetYear() < 0)
-//             continue;
-//
-//         for (const auto& event : d.second)
-//         {
-//             if (p(date, event))
-//             {
-//                 result.push_back(date.GetDate() + " " + event);
-//             }
-//         }
-//     }
-//
-//     return result;
-// }
