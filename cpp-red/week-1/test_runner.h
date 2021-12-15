@@ -113,9 +113,9 @@ class TestRunner
 
 #define ASSERT_EQUAL(x, y)                                                     \
     {                                                                          \
-        ostringstream os;                                                      \
-        os << #x << " != " << #y << ", " << __FILE__ << ":" << __LINE__;       \
-        AssertEqual(x, y, os.str());                                           \
+        ostringstream oss;                                                     \
+        oss << #x << " != " << #y << ", " << __FILE__ << ":" << __LINE__;      \
+        AssertEqual(x, y, oss.str());                                          \
     }
 
 #define ASSERT(x)                                                              \
