@@ -10,6 +10,39 @@
 
 using namespace std;
 
+class RouteManagerV
+{
+  public:
+    void AddRoute(int start, int finish)
+    {
+        reachable_lists_[start].push_back(finish);
+        reachable_lists_[finish].push_back(start);
+    }
+    int FindNearestFinish(int start, int finish) const
+    {
+        int result = abs(start - finish);
+        if (reachable_lists_.count(start) < 1)
+        {
+            return result;
+        }
+        const vector<int>& reachable_stations = reachable_lists_.at(start);
+        if (!reachable_stations.empty())
+        {
+            result = min(
+                result, abs(finish - *min_element(begin(reachable_stations),
+                                                  end(reachable_stations),
+                                                  [finish](int lhs, int rhs) {
+                                                      return abs(lhs - finish) <
+                                                             abs(rhs - finish);
+                                                  })));
+        }
+        return result;
+    }
+
+  private:
+    map<int, vector<int>> reachable_lists_;
+};
+
 class RouteManager
 {
   public:
@@ -47,16 +80,16 @@ class RouteManager
 
             auto it = reachable_stations.upper_bound(finish);
 
-            int nearest = *it;
+            if (it != reachable_stations.end())
+            {
+                result = min(result, abs(*it - finish));
+            }
 
             if (it != reachable_stations.begin())
             {
                 --it;
-                nearest =
-                    abs(finish - nearest) < abs(finish - *it) ? nearest : *it;
+                result = min(result, abs(*it - finish));
             }
-
-            result = min(result, abs(finish - nearest));
         }
 
         return result;
@@ -74,9 +107,10 @@ void TestSlow()
     routes.AddRoute(-2, 5);
     routes.AddRoute(10, 4);
     routes.AddRoute(5, 8);
+    routes.AddRoute(5, 1);
     ASSERT_EQUAL(routes.FindNearestFinish(4, 10), 0);
     ASSERT_EQUAL(routes.FindNearestFinish(4, -2), 6);
-    ASSERT_EQUAL(routes.FindNearestFinish(5, 0), 2);
+    ASSERT_EQUAL(routes.FindNearestFinish(5, 0), 1);
     ASSERT_EQUAL(routes.FindNearestFinish(5, 100), 92);
 }
 
